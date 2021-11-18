@@ -44,19 +44,23 @@ class MainActivity : ComponentActivity() {
                     val transition =
                         updateTransition(targetState = carPosition, label = "carPosition")
 
-                    val carOffset by transition.animateOffset(label = "Car") { position ->
-                        when (position) {
+                    val carOffset: Offset by animateOffsetAsState(
+                        when (carPosition) {
                             CarPosition.TopLeft -> Offset.Zero
                             CarPosition.BottomRight -> Offset(260f, 260f)
                             CarPosition.TopRight -> Offset(260f, 0F)
                             CarPosition.BottomLeft -> Offset(0F, 260f)
-                        }
-                    }
+                        },
+                        //spring(dampingRatio = Spring.DampingRatioLowBouncy)
+                        //spring(stiffness = Spring.StiffnessLow)
+                        //tween(1000)
+                        tween(1000, easing = LinearEasing) //Like a real car
+                    )
 
                     LaunchedEffect(carPosition) {
                         if (iter < 3) {
 
-                            delay(400)
+                            delay(1000)
                             carPosition = getNextPosition(carPosition)
                             iter++
                         }
