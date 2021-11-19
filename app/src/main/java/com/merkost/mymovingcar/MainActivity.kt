@@ -3,7 +3,11 @@ package com.merkost.mymovingcar
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.*
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -24,12 +28,17 @@ import com.merkost.mymovingcar.ui.theme.MyMovingCarTheme
 import kotlinx.coroutines.delay
 
 class MainActivity : ComponentActivity() {
+    @OptIn(ExperimentalAnimationApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContent {
             MyMovingCarTheme {
+
+
                 Surface(Modifier.fillMaxSize()) {
+
+                    var visible by remember { mutableStateOf(false) }
                     val animationDuration: Int = 1000
                     var iter by remember { mutableStateOf(10) }
                     var carPosition by remember { mutableStateOf(CarPosition.TopLeft) }
@@ -68,29 +77,61 @@ class MainActivity : ComponentActivity() {
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Center
                     ) {
-                        Text("Update Transition", fontSize = 32.sp)
-                        Button(
-                            modifier = Modifier.padding(top = 20.dp, bottom = 30.dp),
-                            onClick = {
-                                iter = 0
-                                carPosition = getNextPosition(carPosition)
-                            }
-                        ) {
-                            Text("Move now!")
+                        AnimatedVisibility(visible) {
+                            Text("Update Transition", fontSize = 32.sp)
                         }
-                        Box(
-                            modifier = Modifier
-                                .size(300.dp)
-                                .background(Color.White).border(BorderStroke(2.dp, Color.Gray))
+                        AnimatedVisibility(visible) {
+                            Button(
+                                modifier = Modifier.padding(top = 20.dp, bottom = 30.dp),
+                                onClick = {
+                                    iter = 0
+                                    carPosition = getNextPosition(carPosition)
+                                }
+                            ) {
+                                Text("Move now!")
+                            }
+                        }
+                        AnimatedVisibility(visible,
+                            enter = slideInVertically(
+                                initialOffsetY = {
+                                    // Slide in from top
+                                    2 * it
+                                },
+                                animationSpec = tween(
+                                    durationMillis = 500,
+                                    //delayMillis = MainActivity.splashFadeDurationMillis / 2,
+                                    //easing = CubicBezierEasing(0f, 0f, 0f, 1f)
+                                )
+                            ),
+                            exit = slideOutVertically(
+                                targetOffsetY = {
+                                    // Slide in from top
+                                    2 * it
+                                },
+                                animationSpec = tween(
+                                    durationMillis = 500,
+                                    //easing = CubicBezierEasing(0f, 0f, 0f, 1f)
+                                )
+                            ),
                         ) {
-                            MyCustomCar(
+                            Box(
                                 modifier = Modifier
-                                    .offset(carOffset.x.dp, carOffset.y.dp)
-                                    .background(Color.Yellow)
-                            )
+                                    .size(300.dp)
+                                    .background(Color.White).border(BorderStroke(2.dp, Color.Gray))
+                            ) {
+                                MyCustomCar(
+                                    modifier = Modifier
+                                        .offset(carOffset.x.dp, carOffset.y.dp)
+                                        .background(Color.Yellow)
+                                )
+                            }
                         }
                     }
+                    LaunchedEffect(this) {
+                        visible = true
+                    }
                 }
+
             }
         }
     }
