@@ -3,10 +3,7 @@ package com.merkost.mymovingcar
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.animateOffsetAsState
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.core.updateTransition
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -46,10 +43,16 @@ class MainActivity : ComponentActivity() {
                             CarPosition.TopRight -> Offset(260f, 0F)
                             CarPosition.BottomLeft -> Offset(0F, 260f)
                         },
+                        /*when (carPosition) {
+                            CarPosition.TopLeft -> spring(dampingRatio = Spring.DampingRatioLowBouncy)
+                            CarPosition.BottomRight -> spring(stiffness = Spring.StiffnessLow)
+                            CarPosition.TopRight -> tween(1000)
+                            CarPosition.BottomLeft ->  tween(animationDuration, easing = FastOutSlowInEasing)
+                        },*/
                         //spring(dampingRatio = Spring.DampingRatioLowBouncy)
                         //spring(stiffness = Spring.StiffnessLow)
                         //tween(1000)
-                        tween(animationDuration, easing = LinearEasing) //Like a real car
+                        tween(animationDuration, easing = FastOutSlowInEasing) //Like a real car
                     )
 
                     LaunchedEffect(carPosition) {
